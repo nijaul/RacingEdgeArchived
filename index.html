@@ -31,43 +31,80 @@ table{width:100%;border-collapse:collapse;font-size:12px}th{text-align:left;colo
 
 /* ADD-ON: BRIS DECODER */
 .brisAddGrid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin-top:10px}.brisAddCard{background:#203a4b;border:1px solid #314d61;border-radius:7px;padding:10px}.brisAddCard strong{display:block;font-size:18px;margin-top:4px;color:#8cdeba}.brisAddActions{display:flex;flex-wrap:wrap;gap:8px;margin:10px 0}.brisAddTable{max-height:420px;overflow:auto;border:1px solid #31475a;border-radius:6px}.brisAddTable table{min-width:1040px}.brisAddTable th,.brisAddTable td{white-space:nowrap}.brisHot{font-weight:800;color:#8cdeba}.brisWarn{color:#f0dfaa}.brisCopyBox{width:100%;min-height:90px;background:#10202c;color:#dcecf5;border:1px solid #3b5669;border-radius:6px;padding:9px;font:12px Consolas,monospace;resize:vertical}.brisLegend{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}.brisLegend span{background:#253f51;border-radius:999px;padding:4px 7px;color:#a9c4d4;font-size:10px}@media(max-width:900px){.brisAddGrid{grid-template-columns:repeat(2,1fr)}}
+
+/* RACETWIN VISUAL REFRESH — presentation only; no changes to race calculations */
+:root{--bg:#07111d;--panel:#102234;--line:#294258;--fg:#eff7fc;--muted:#a7c0d1;--accent:#60d9ee;--green:#6ce5b5}
+html{scroll-behavior:smooth;scroll-padding-top:112px}
+body{font:14px/1.5 Inter,"Segoe UI",Arial,sans-serif;background:radial-gradient(ellipse 1000px 600px at 65% -140px,#1a465a 0%,transparent 72%),#07111d;color:var(--fg)}
+header{height:auto;min-height:84px;padding:18px clamp(16px,3vw,40px);background:rgba(9,26,41,.96);border-bottom:1px solid #31536a;gap:16px;flex-wrap:wrap}
+.brand{font-size:25px;letter-spacing:.9px}
+.subtitle{font-size:10px;letter-spacing:1.5px}
+.rt-workflow{display:flex;align-items:stretch;gap:9px;padding:14px clamp(14px,2vw,28px);background:#0b1a29;border-bottom:1px solid var(--line);flex-wrap:wrap}
+.rt-workflow a{display:flex;align-items:center;gap:12px;flex:1;min-width:178px;text-decoration:none;color:var(--fg);background:#142a3c;border:1px solid #2e4a60;border-radius:11px;padding:10px 14px;transition:background .15s,border-color .15s}
+.rt-workflow a:hover,.rt-workflow a:focus-visible{background:#1d4055;border-color:#6bd7ed;outline:none}
+.rt-workflow a strong,.rt-workflow a small{display:block}
+.rt-workflow a strong{font-size:13px;letter-spacing:.2px}
+.rt-workflow a small{color:var(--muted);font-size:11px}
+.rt-step{display:inline-grid;place-items:center;flex:0 0 34px;height:34px;background:#21495a;border-radius:9px;color:#8ce5f3;font-size:12px;font-weight:800}
+.rt-workflow-note{align-self:center;color:#90b2c5;font-size:11px;padding:6px 12px}
+.app{grid-template-columns:minmax(210px,245px) minmax(0,1fr) minmax(280px,330px);gap:16px;padding:18px clamp(12px,2vw,30px);min-height:calc(100vh - 170px);align-items:start}
+.panel{background:linear-gradient(160deg,#152b3e,#102233 75%);border:1px solid #2c4559;border-radius:14px;padding:clamp(15px,1.5vw,22px);box-shadow:0 8px 24px rgba(0,0,0,.12)}
+.stack{gap:16px}
+h2{font-size:13px;letter-spacing:1.1px;color:#f4fbff;line-height:1.6;margin-bottom:13px}
+h3{font-size:12px;letter-spacing:.45px;color:#c9e7f3}
+p{line-height:1.65}
+button{background:#23445c;border:1px solid #41657d;border-radius:9px;padding:10px 14px;transition:background .15s,transform .15s;min-height:38px}
+button:hover:not(:disabled){background:#315f7c;transform:translateY(-1px)}
+button:focus-visible,select:focus-visible,input:focus-visible,a:focus-visible{outline:2px solid #83e3f1;outline-offset:2px}
+button.primary{background:linear-gradient(120deg,#127da1,#2197aa);border-color:#51c4da;color:#fff}
+button.primary:hover:not(:disabled){background:#238fb3}
+button.green{background:#126b56;border-color:#35b28e}
+select,input:not([type=range]):not([type=checkbox]):not([type=file]){background:#183349;color:#eef9ff;border:1px solid #44657c;border-radius:8px;padding:9px;max-width:100%}
+input[type=checkbox]{accent-color:#50c9d9;width:16px;height:16px;vertical-align:middle}
+input[type=range]{accent-color:#65d7e9}
+.race{background:#1b3549;border-radius:9px;border:1px solid #35566c;padding:12px}
+.race.active{background:#1c5068;border-color:#6cd7ec;box-shadow:inset 3px 0 #6cdaef}
+#raceList{max-height:65vh;overflow:auto;padding-right:3px}
+.trackCard{border-radius:13px;border-color:#426c70;background:radial-gradient(ellipse at center,#1e4846,#0c2834)}
+.runner{border:1px solid #345367;border-radius:8px;padding:10px}
+.kpi{border:1px solid #33546b;border-radius:10px;background:#1b3b50;padding:15px}
+.kpi strong{color:#8ceec3;font-size:23px}
+th{color:#bad5e3;font-size:11px;letter-spacing:.3px}
+td,th{padding:10px 7px;border-bottom:1px solid #2a465b}
+tbody tr:hover{background:rgba(114,202,227,.055)}
+.status{font-size:12px;color:#b5d9e9;line-height:1.65}
+.notice{background:#373c2a;border-color:#77724b}
+.rt-label{display:inline-block;margin-left:6px;padding:3px 8px;border-radius:20px;background:#1c4858;color:#8fe0ef;font-size:9px;vertical-align:middle;letter-spacing:.5px}
+#raceSimulatorPanel{border-color:#437589;background:linear-gradient(150deg,#163347,#102537 70%)}
+#historicalBacktestPanel{border-color:#385e6f}
+#historicalBacktestPanel .controls{background:#0e2435;border:1px solid #2e5266;border-radius:10px;padding:12px}
+#calibrationStatus{padding:12px;border-radius:9px;background:#102f3b;border:1px solid #32596a;margin-top:10px}
+#raceClock{border:1px solid #34775d;background:#173d36;border-radius:999px;padding:5px 11px;font-size:12px!important}
+#raceMeta{line-height:1.6}
+@media(min-width:1180px){.app>aside:first-child{position:sticky;top:14px}}
+@media(max-width:1180px){.app{grid-template-columns:220px minmax(0,1fr)}.right{grid-column:2}.rt-workflow-note{display:none}}
+@media(max-width:740px){header{padding:14px}.app{display:flex;flex-direction:column;padding:12px}.app>aside,.app>main{width:100%}.right{grid-column:auto}.panel{width:100%;margin-bottom:0}.rt-workflow{padding:10px}.rt-workflow a{min-width:135px;padding:9px}.rt-workflow a small{font-size:10px}.kpis{grid-template-columns:repeat(3,minmax(0,1fr))}.kpi{padding:10px}.kpi strong{font-size:17px}.controls{gap:7px}}
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}button,.rt-workflow a{transition:none}}
+.rt-mode-label{display:flex;align-items:center;gap:8px;color:#b9dfe9;font-size:10px;font-weight:800;letter-spacing:.8px;margin-bottom:14px;line-height:1.5}
+.rt-mode-dot{width:8px;height:8px;flex:0 0 8px;border-radius:50%;background:#5ed6bf}
+#raceSimulatorPanel .rt-mode-dot{background:#69c3ef}
+.num.horseNum{min-width:23px;box-sizing:border-box;text-shadow:none}
 </style></head>
 <body>
 <header><div><div class="brand">RACE<span>TWIN</span> AI <span style="font-size:12px;color:#a9d4e4">v0.1</span></div><div class="subtitle">INTERACTIVE THOROUGHBRED RACE SIMULATION</div></div>
 <div class="controls"><span id="sourceLabel" class="muted small">Built-in Keeneland samples</span><button id="importBtn" class="primary">OPEN BRISNET .DRF</button><input id="fileInput" type="file" accept=".drf,.DRF"></div></header>
+<nav class="rt-workflow" aria-label="RaceTwin workflow">
+ <a href="#historicalBacktestPanel"><span class="rt-step">01</span><span><strong>Calibrate</strong><small>Train on historical races</small></span></a>
+ <a href="#raceSimulatorPanel"><span class="rt-step">02</span><span><strong>Simulate</strong><small>Run upcoming race cards</small></span></a>
+ <a href="#archiveExportPanel"><span class="rt-step">03</span><span><strong>Review & export</strong><small>Audit historical results</small></span></a>
+ <span class="rt-workflow-note">Original engine preserved · Experimental calibration optional</span>
+</nav>
 <div class="app">
 <aside class="panel"><h2>TRACK / RACE SELECTOR</h2><select id="cardSelect" style="width:100%;background:#284156;color:white;padding:9px;border:1px solid #4a667a;border-radius:5px;margin-bottom:13px"></select><div id="raceList"></div>
 <h3>SIMULATION ASSUMPTIONS</h3><p class="muted small" style="line-height:1.6">Morning-line market shares are used as a baseline. Early pace and horse ability are illustrative synthetic variables, not decoded BRIS pace ratings.</p></aside>
 <main class="stack">
 
-<section class="panel" id="historicalResultsPanel">
-  <h2>HISTORICAL RACE RESULTS · BEFORE OCT 19, 2026</h2>
-  <p class="muted small" style="line-height:1.6">Verified top-three finishers for selected Keeneland races are stored inside this HTML (Oct 9 races 1–10; Oct 14 races 1–4; Oct 15, 17, and 18 race 1). For remaining past cards/races, use the official results links below; those charts open online and are not cached into this file yet. Scratches and finish order can differ from the original DRF entries.</p>
-  <div class="controls" style="margin:10px 0">
-    <label for="historicalDateSelect" class="muted small">Track / date</label>
-    <select id="historicalDateSelect" style="background:#284156;color:white;padding:9px;border:1px solid #4a667a;border-radius:5px"></select>
-    <button id="historicalOpenBtn" class="primary">OPEN OFFICIAL RESULTS</button>
-  </div>
-  <div id="historicalResultStatus" class="status"></div>
-  <div id="historicalResultTable" style="margin-top:10px;overflow:auto"></div>
-  <div id="historicalResultLinks" class="status" style="margin-top:10px;line-height:1.9"></div>
-</section>
-
-<section class="panel" id="historicalBacktestPanel">
-  <h2>HISTORICAL BACKTEST & MODEL CALIBRATION</h2>
-  <p class="muted small" style="line-height:1.6">Runs the current simulation against archived races without exposing the finish order to the simulated outcomes, then jointly fits morning-line prior strength and horse-ability influence against winners and top-three finishes. Calibration is applied only when explicitly enabled and when complete starter lists are available. Otherwise, run diagnostics without changing the original model. Only races with embedded, name-matched results are used. This archive currently stores top-three finishers, not complete official starter/scratch lists; unknown scratches are never guessed or silently removed.</p>
-  <div class="controls" style="display:flex;gap:8px;flex-wrap:wrap;margin:10px 0">
-    <label class="muted small" for="historicalTrials">Trials per race / setting</label>
-    <select id="historicalTrials" style="background:#284156;color:white;padding:9px;border:1px solid #4a667a;border-radius:5px"><option value="600">600 · faster</option><option value="1200" selected>1,200 · balanced</option><option value="2500">2,500 · slower</option></select>
-    <button id="historicalBacktestBtn" class="primary">RUN BACKTEST & CALIBRATE</button>
-    <button id="autoCalibrateBtn" class="primary">RUN ARCHIVES & AUTO-CALIBRATE</button><button id="resetCalibrationBtn">RESET CALIBRATION</button><label class="muted small"><input type="checkbox" id="enableCalibration"> USE VALIDATED CALIBRATION FOR CURRENT RACES</label>
-  </div>
-  <p class="muted small">Auto-calibration runs archived race trials after verified scratches, fits on older dates, tests on later dates, and activates weights only if holdout log loss improves. Current race results are never used. Keep the original engine if validation fails.</p><div id="calibrationStatus" class="status">Original weights remain active: prior 0.55, ability 0.85. Calibration requires complete official starter lists. This example supplies eight races; any fitted weights are provisional and should be validated on additional dates.</div>
-  <div id="calibrationMetrics" style="margin-top:10px;overflow:auto"></div>
-  <p class="muted small" style="line-height:1.6;margin-top:10px">Important: this is a limited calibration, not proof of profitable wagering. The embedded historical data now includes verified starter/scratch lists for the eight Oct 14 races, but does not yet include every race's complete finish order, payouts, or confirmed scratches. For scratch-correct backtests, add official starter lists or explicit scratched-horse lists to the archive.</p>
-</section>
-
-<section class="panel"><div style="display:flex;justify-content:space-between;gap:10px;align-items:center"><div><h2 id="raceTitle" style="margin-bottom:6px">RACE SIMULATOR</h2><div id="raceMeta" class="muted small"></div></div><span id="raceClock" style="color:#87e3b5;font-size:17px;font-weight:800">READY</span></div>
+<section class="panel" id="raceSimulatorPanel"><div class="rt-mode-label"><span class="rt-mode-dot"></span> LIVE RACE PREDICTION · Simulated probabilities, not verified results</div><div style="display:flex;justify-content:space-between;gap:10px;align-items:center"><div><h2 id="raceTitle" style="margin-bottom:6px">RACE SIMULATOR</h2><div id="raceMeta" class="muted small"></div></div><span id="raceClock" style="color:#87e3b5;font-size:17px;font-weight:800">READY</span></div>
 <div class="trackCard" style="margin-top:14px">
 <svg id="trackSvg" viewBox="0 0 800 350" aria-label="Animated racecourse">
 <rect x="42" y="35" width="716" height="270" rx="135" fill="#24483e" stroke="#779a93" stroke-width="13"/>
@@ -82,6 +119,33 @@ table{width:100%;border-collapse:collapse;font-size:12px}th{text-align:left;colo
 <div id="leaderboard" class="leaderboard"></div></section>
 <section class="panel"><h2>MONTE CARLO OUTLOOK</h2><div class="kpis"><div class="kpi"><span class="muted small">Simulations</span><strong id="simCount">0</strong></div><div class="kpi"><span class="muted small">Top baseline horse</span><strong id="topHorse">—</strong></div><div class="kpi"><span class="muted small">Race progress</span><strong id="progress">0%</strong></div></div>
 <div style="margin-top:13px;max-height:310px;overflow:auto"><table><thead><tr><th>Runner</th><th style="text-align:right">ML Share</th><th style="text-align:right">Sim Win</th><th style="text-align:right">Sim Top 2</th></tr></thead><tbody id="simRows"></tbody></table></div></section>
+<section class="panel" id="historicalResultsPanel">
+  <h2>HISTORICAL RACE RESULTS · BEFORE OCT 19, 2026</h2>
+  <p class="muted small" style="line-height:1.6">Verified top-three finishers for selected Keeneland races are stored inside this HTML (Oct 9 races 1–10; Oct 14 races 1–4; Oct 15, 17, and 18 race 1). For remaining past cards/races, use the official results links below; those charts open online and are not cached into this file yet. Scratches and finish order can differ from the original DRF entries.</p>
+  <div class="controls" style="margin:10px 0">
+    <label for="historicalDateSelect" class="muted small">Track / date</label>
+    <select id="historicalDateSelect" style="background:#284156;color:white;padding:9px;border:1px solid #4a667a;border-radius:5px"></select>
+    <button id="historicalOpenBtn" class="primary">OPEN OFFICIAL RESULTS</button>
+  </div>
+  <div id="historicalResultStatus" class="status"></div>
+  <div id="historicalResultTable" style="margin-top:10px;overflow:auto"></div>
+  <div id="historicalResultLinks" class="status" style="margin-top:10px;line-height:1.9"></div>
+</section>
+
+<section class="panel" id="historicalBacktestPanel"><div class="rt-mode-label"><span class="rt-mode-dot"></span> HISTORICAL CALIBRATION · Compare past predictions with official results</div>
+  <h2>HISTORICAL BACKTEST & MODEL CALIBRATION <span class="rt-label">STEP 1 · HISTORICAL</span></h2>
+  <p class="muted small" style="line-height:1.6">Runs the current simulation against archived races without exposing the finish order to the simulated outcomes, then jointly fits morning-line prior strength and horse-ability influence against winners and top-three finishes. Calibration is applied only when explicitly enabled and when complete starter lists are available. Otherwise, run diagnostics without changing the original model. Only races with embedded, name-matched results are used. Archive verification requires matching official starters; unmatched races are excluded, not guessed.</p>
+  <div class="controls" style="display:flex;gap:8px;flex-wrap:wrap;margin:10px 0">
+    <label class="muted small" for="historicalTrials">Trials per race / setting</label>
+    <select id="historicalTrials" style="background:#284156;color:white;padding:9px;border:1px solid #4a667a;border-radius:5px"><option value="600">600 · faster</option><option value="1200" selected>1,200 · balanced</option><option value="2500">2,500 · slower</option></select>
+    <button id="historicalBacktestBtn" class="primary">RUN BACKTEST & CALIBRATE</button>
+    <button id="autoCalibrateBtn" class="primary">RUN ARCHIVES & AUTO-CALIBRATE</button><button id="resetCalibrationBtn">RESET CALIBRATION</button><label class="muted small"><input type="checkbox" id="enableCalibration"> USE VALIDATED CALIBRATION FOR CURRENT RACES</label>
+  </div>
+  <p class="muted small">Historical-only calibration: ONLY races with uploaded official results and matching pre-race BRIS cards are considered. Unresulted cards and the currently selected race are ignored. Verified scratches are removed; parameters are fitted on earlier resulted dates and tested on later resulted dates. Approved settings are then used by the normal simulator.</p><div id="calibrationStatus" class="status">HISTORICAL CALIBRATION MODE — Official archived results are used only to evaluate past races. Original weights remain active: prior 0.55, ability 0.85. Calibration requires uploaded results, a matching BRIS card, verified starters, and a complete top-three finish. Unresulted race cards are never training inputs.</div>
+  <div id="calibrationMetrics" style="margin-top:10px;overflow:auto"></div>
+  <p class="muted small" style="line-height:1.6;margin-top:10px">Important: this is a limited calibration, not proof of profitable wagering. The embedded historical data now includes verified starter/scratch lists for the eight Oct 14 races, but does not yet include every race's complete finish order, payouts, or confirmed scratches. For scratch-correct backtests, add official starter lists or explicit scratched-horse lists to the archive.</p>
+</section>
+
 </main>
 <aside class="stack right">
 <section class="panel"><h2>SCENARIO CONTROLS</h2>
@@ -132,8 +196,8 @@ table{width:100%;border-collapse:collapse;font-size:12px}th{text-align:left;colo
 <textarea id="brisCopyBox" class="brisCopyBox" readonly placeholder="Click COPY BULK E1/E2/LP/SPD"></textarea>
 <div class="brisLegend"><span>E1 = 1st call pace</span><span>E2 = 2nd call pace</span><span>LP = late pace</span><span>SPD = speed rating</span><span>TT = E2 − E1</span><span>SP = (E2 + LP) / 2</span><span>OE = (LX + E1) / 2</span></div>
 </section>
-<section class="panel"><h2>ARCHIVE SIMULATION &amp; CALIBRATION EXPORT</h2>
-<p class="muted small">Runs archived races using pre-race BRIS cards, then scores predictions against their recorded winners. Compares default weights with your saved candidate weights; does not change either engine or apply calibration. The export includes horse-level win probabilities and data-quality flags for review.</p>
+<section class="panel" id="archiveExportPanel"><h2>ARCHIVE SIMULATION &amp; CALIBRATION EXPORT</h2>
+<p class="muted small">Runs archived races using pre-race BRIS cards, evaluates top-five exactas and trifectas, then scores predictions against their recorded winners. Compares default weights with your saved candidate weights; does not change either engine or apply calibration. The export includes horse-level win probabilities and data-quality flags for review.</p>
 <div class="controls" style="display:flex;gap:9px;flex-wrap:wrap;align-items:center">
 <label for="archiveTrials">Runs per race/model</label><select id="archiveTrials"><option value="1000">1,000</option><option value="2500" selected>2,500</option><option value="10000">10,000</option></select>
 <button id="archiveRunBtn" class="primary">RUN ALL ARCHIVED RACES</button><button id="archiveCancelBtn">CANCEL</button>
@@ -157,7 +221,24 @@ window.RACETWIN_SAMPLES = [{"file":"KEE1009.DRF","entries":[{"track":"KEE","date
 <script>
 "use strict";
 const $=id=>document.getElementById(id);
-const colors=['#79d8ed','#eac67b','#8bdb9b','#e89f9f','#c9b2ef','#e6e6e6','#edac68','#89c9db','#f29cc7','#b6d67e','#b2a3ed','#f0df8a','#c0d4de','#e39d73','#85c4a7','#f1acac'];
+// North American Thoroughbred saddlecloth colors, keyed by PROGRAM number (not post or array index).
+const SADDLECLOTHS=[
+ ['#FF0000','#FFFFFF'],['#FFFFFF','#000000'],['#0000FF','#FFFFFF'],
+ ['#FFFF00','#000000'],['#008000','#FFFFFF'],['#000000','#EAB308'],
+ ['#FFA500','#000000'],['#FFC0CB','#000000'],['#40E0D0','#000000'],
+ ['#800080','#FFFFFF'],['#808080','#FFFFFF'],['#00FF00','#000000'],
+ ['#A52A2A','#FFFFFF'],['#800000','#FFFFFF'],['#F0E68C','#000000']
+];
+const EXTENDED_SADDLECLOTHS=[['#355C7D','#FFFFFF'],['#C06C84','#000000'],['#6C5B7B','#FFFFFF'],['#E6A23C','#000000'],['#006D77','#FFFFFF']];
+function saddlecloth(number){
+ const raw=String(number??'').trim();
+ const m=raw.match(/^\s*(\d+)/);
+ const n=m?Number(m[1]):0;
+ const pair=n>=1&&n<=15?SADDLECLOTHS[n-1]:n>15?EXTENDED_SADDLECLOTHS[(n-16)%EXTENDED_SADDLECLOTHS.length]:['#536777','#FFFFFF'];
+ return {background:pair[0],foreground:pair[1],number:raw};
+}
+function saddleStyle(number){const c=saddlecloth(number);return `background:${c.background};color:${c.foreground};border:1px solid ${c.background==='#FFFFFF'?'#64748b':'rgba(255,255,255,.3)'}`;}
+
 let cards=window.RACETWIN_SAMPLES||[],cardIndex=0,raceNo=1,entries=[],state=null,animId=null,lastTick=0,simStats=null,scratched=new Set();
 let batchBusy=false,batchTimer=null,batchToken=0;
 function esc(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
@@ -167,7 +248,7 @@ function oddsWeights(){const raw=entries.map((e,i)=>scratched.has(i)?0:(Number.i
 function initCards(){ $('cardSelect').innerHTML=cards.map((c,i)=>`<option value="${i}">${esc(c.file)}</option>`).join('');$('cardSelect').value=cardIndex;renderRaceList();chooseRace(raceList()[0])}
 function renderRaceList(){$('raceList').innerHTML=raceList().map(r=>{let e=cards[cardIndex].entries.filter(x=>x.race===r);return `<button class="race ${r===raceNo?'active':''}" data-race="${r}">R${r} · ${e[0].surface==='T'?'Turf':'Dirt'}<small>${e.length} entries · ${Math.round(Number(e[0].distance)/220*10)/10}F</small></button>`}).join('');document.querySelectorAll('.race').forEach(b=>b.addEventListener('click',()=>chooseRace(+b.dataset.race)))}
 function chooseRace(r){cancelBatch();dynamicStop("Race changed. Run again.");invalidateLab();stop();raceNo=r;scratched=new Set();entries=cards[cardIndex].entries.filter(e=>e.race===r);simStats=null;state=null;renderRaceList();const e=entries[0];$('raceTitle').textContent=`${e.track} · RACE ${r}`;$('raceMeta').textContent=`${e.date}  ·  ${e.condition}  ·  ${Math.round(Number(e.distance)/220*10)/10} F  ·  ${e.surface==='T'?'TURF':e.surface==='D'?'DIRT':e.surface}  ·  ${entries.length} entries`;$('raceClock').textContent='READY';$('simCount').textContent='0';$('progress').textContent='0%';let w=oddsWeights(),best=w.indexOf(Math.max(...w));$('topHorse').textContent='#'+entries[best].number;$('insight').innerHTML=`<b>${esc(entries[best].horse)}</b> has the highest normalized morning-line share (${(w[best]*100).toFixed(1)}%).<br><br>All ${entries.length} entrants are included. Click a horse number to scratch/unscratch it; scratched horses are excluded from the simulator.`;$('exactas').textContent='Run Monte Carlo simulation to generate rankings.';$('trifectas').textContent='Run Monte Carlo simulation to generate rankings.';$('superfectas').textContent='Run Monte Carlo simulation to generate rankings.';renderRows();renderHandicapping();drawTrack(0)}
-function renderRows(){let w=oddsWeights();$('simRows').innerHTML=entries.map((e,i)=>{let n=simStats?.wins[i]||0,t=simStats?.top2[i]||0,N=simStats?.n||0,s= scratched.has(i);return `<tr class="${s?'scratchedRow':''}"><td><span class="num horseNum ${s?'scratched':''}" data-horse-index="${i}" title="${s?'Click to restore horse':'Click to scratch horse'}" style="background:${colors[i%colors.length]}">${esc(e.number)}</span>${esc(e.horse)}${s?' <span class="muted small">(SCRATCHED)</span>':''}</td><td class="numcol">${s?'—':(w[i]*100).toFixed(1)+'%'}</td><td class="numcol">${s?'—':(N?(100*n/N).toFixed(1)+'%':'—')}</td><td class="numcol">${s?'—':(N?(100*t/N).toFixed(1)+'%':'—')}</td></tr>`}).join('')}
+function renderRows(){let w=oddsWeights();$('simRows').innerHTML=entries.map((e,i)=>{let n=simStats?.wins[i]||0,t=simStats?.top2[i]||0,N=simStats?.n||0,s= scratched.has(i);return `<tr class="${s?'scratchedRow':''}"><td><span class="num horseNum ${s?'scratched':''}" data-horse-index="${i}" title="${s?'Click to restore horse':'Click to scratch horse'}" style="${saddleStyle(e.number)}">${esc(e.number)}</span>${esc(e.horse)}${s?' <span class="muted small">(SCRATCHED)</span>':''}</td><td class="numcol">${s?'—':(w[i]*100).toFixed(1)+'%'}</td><td class="numcol">${s?'—':(N?(100*n/N).toFixed(1)+'%':'—')}</td><td class="numcol">${s?'—':(N?(100*t/N).toFixed(1)+'%':'—')}</td></tr>`}).join('')}
 document.addEventListener('click',ev=>{const el=ev.target.closest('.horseNum');if(!el)return;const i=Number(el.dataset.horseIndex);if(!Number.isInteger(i))return;scratched.has(i)?scratched.delete(i):scratched.add(i);cancelBatch();dynamicStop("Field changed. Run again.");invalidateLab();stop();state=null;simStats=null;$('simCount').textContent='0';$('progress').textContent='0%';$('raceClock').textContent='READY';$('exactas').textContent='Field changed. Run simulations again.';$('trifectas').textContent='Field changed. Run simulations again.';$('superfectas').textContent='Field changed. Run simulations again.';renderRows();renderHandicapping();drawTrack(0);const active=activeIndices();$('status').textContent=`${entries.length-active.length} horse${entries.length-active.length===1?' is':'s are'} scratched. ${active.length} runner${active.length===1?'':'s'} remain in the simulation.`;$('insight').innerHTML=`${active.length} of ${entries.length} horses are active. Click a number again to restore a scratched horse.`});
 function randomNormal(){let u=1-Math.random(),v=Math.random();return Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*v)}
 function avg(a,n=3){let v=(a||[]).filter(x=>Number.isFinite(x)&&x>0).slice(0,n);return v.length?v.reduce((s,x)=>s+x,0)/v.length:null}
@@ -391,7 +472,7 @@ $('dynamicPreview').onclick=()=>{
  '<td>'+(p.breakLoss?'Slow break; ':'')+(p.wide?'Wide trip; ':'')+(p.traffic?'Traffic; ':'')+(!p.breakLoss&&!p.wide&&!p.traffic?'Clean trip':'')+'</td></tr>'}).join('')+'</tbody></table></div><p class="small muted">Positions are ranked at each segment; trip events are random. This preview does not change the original race animation.</p>';
 };
 
-function drawTrack(t){const g=$('horses');g.innerHTML='';const w=oddsWeights();let order=state?.order||w.map((v,i)=>({v,i})).sort((a,b)=>b.v-a.v).map(x=>x.i);entries.forEach((e,i)=>{if(scratched.has(i))return;let rank=order.indexOf(i);let progress=state?Math.max(0,Math.min(1,t+(.5-rank/Math.max(1,entries.length-1))*.065*t)):0;let theta=-Math.PI/2+2*Math.PI*progress;let lane=i%5;let rx=335-lane*8,ry=119-lane*7;let x=400+rx*Math.cos(theta),y=170+ry*Math.sin(theta);g.innerHTML+=`<g><circle cx="${x.toFixed(2)}" cy="${y.toFixed(2)}" r="12" fill="${colors[i%colors.length]}" stroke="#112532" stroke-width="2"/><text x="${x.toFixed(2)}" y="${(y+4).toFixed(2)}" fill="#10212e" text-anchor="middle" font-size="11" font-weight="800">${esc(e.number)}</text></g>`});$('leaderboard').innerHTML=order.slice(0,8).map((i,rank)=>`<div class="runner"><span><span class="num horseNum ${scratched.has(i)?'scratched':''}" data-horse-index="${i}" style="background:${colors[i%colors.length]}" title="Click to scratch/restore">${esc(entries[i].number)}</span><strong>${esc(entries[i].horse)}</strong></span><span class="muted">#${rank+1}</span></div>`).join('')}
+function drawTrack(t){const g=$('horses');g.innerHTML='';const w=oddsWeights();let order=state?.order||w.map((v,i)=>({v,i})).sort((a,b)=>b.v-a.v).map(x=>x.i);entries.forEach((e,i)=>{if(scratched.has(i))return;let rank=order.indexOf(i);let progress=state?Math.max(0,Math.min(1,t+(.5-rank/Math.max(1,entries.length-1))*.065*t)):0;let theta=-Math.PI/2+2*Math.PI*progress;let lane=i%5;let rx=335-lane*8,ry=119-lane*7;let x=400+rx*Math.cos(theta),y=170+ry*Math.sin(theta);g.innerHTML+=`<g><circle cx="${x.toFixed(2)}" cy="${y.toFixed(2)}" r="12" fill="${saddlecloth(e.number).background}" stroke="#112532" stroke-width="2"/><text x="${x.toFixed(2)}" y="${(y+4).toFixed(2)}" fill="${saddlecloth(e.number).foreground}" text-anchor="middle" font-size="11" font-weight="800">${esc(e.number)}</text></g>`});$('leaderboard').innerHTML=order.slice(0,8).map((i,rank)=>`<div class="runner"><span><span class="num horseNum ${scratched.has(i)?'scratched':''}" data-horse-index="${i}" style="${saddleStyle(entries[i].number)}" title="Click to scratch/restore">${esc(entries[i].number)}</span><strong>${esc(entries[i].horse)}</strong></span><span class="muted">#${rank+1}</span></div>`).join('')}
 function tick(ts){if(!state||state.paused)return;let dt=lastTick?Math.min(.05,(ts-lastTick)/1000):0;lastTick=ts;state.t=Math.min(1,state.t+dt*(+$('speed').value)*.065);$('progress').textContent=Math.round(state.t*100)+'%';$('raceClock').textContent=state.t>=1?'FINISHED':Math.round(state.t*100)+'% COMPLETE';drawTrack(state.t);if(state.t<1)animId=requestAnimationFrame(tick);else{animId=null;$('status').textContent='Animated scenario complete. Run again for a different synthetic result.'}}
 function stop(){if(animId!==null)cancelAnimationFrame(animId);animId=null;lastTick=0}
 $('playBtn').onclick=()=>{if(state?.paused){state.paused=false;lastTick=0;animId=requestAnimationFrame(tick);return}stop();state={t:0,order:modelRun().order,paused:false};animId=requestAnimationFrame(tick)};
@@ -544,9 +625,14 @@ function rtCanonicalTrack(value){
  const t=String(value||'').toUpperCase().replace(/[^A-Z]/g,'');
  return ({KEENELAND:'KEE',BELMONT:'BEL',BELMONTATTHEBIGA:'BEL',GULFSTREAM:'GP',GULFSTREAMPARK:'GP',GPX:'GP',INDIANA:'IND',INDIANAGRAND:'IND',HORSESHOEINDIANAPOLIS:'IND'})[t]||t;
 }
+// Historical-only lookup: a BRIS card is eligible ONLY when the archive has
+// an uploaded result record for this exact track/date. The selected/live card
+// and its entries are never used to assemble calibration examples.
 function rtFindCard(track,date){
  const d=rtCanonicalDate(date),t=rtCanonicalTrack(track);
- return cards.find(c=>c.entries.some(e=>rtCanonicalTrack(e.track)===t&&rtCanonicalDate(e.date)===d));
+ const hasUploadedResult=rtCanonicalHistoricalResults().some(r=>r.date===d&&r.track===t);
+ if(!hasUploadedResult)return null;
+ return cards.find(c=>c.entries.some(e=>rtCanonicalTrack(e.track)===t&&rtCanonicalDate(e.date)===d))||null;
 }
 // Merge result records by canonical track/date/race. Prefer complete chart starter lists
 // over older top-three-only records. Never double count duplicate uploads.
@@ -604,28 +690,54 @@ function rtSoftmaxLogShares(field,priorWeight){
 }
 function rtSeededRandom(seed){let x=seed>>>0;return ()=>{x=(x+0x6D2B79F5)>>>0;let z=x;z=Math.imul(z^(z>>>15),z|1);z^=z+Math.imul(z^(z>>>7),z|61);return ((z^(z>>>14))>>>0)/4294967296;};}
 function rtSeedForRace(race){let h=2166136261;for(const ch of `${race.key}|${race.race}`){h^=ch.charCodeAt(0);h=Math.imul(h,16777619);}return h>>>0;}
+function rtRankedCombinations(counts,field,limit=5){
+ return [...counts.entries()].sort((a,b)=>b[1]-a[1]||a[0].localeCompare(b[0])).slice(0,limit)
+  .map(([key,count],idx)=>({rank:idx+1,horseIndices:key.split(',').map(Number),
+   numbers:key.split(',').map(i=>field[+i].number),
+   horses:key.split(',').map(i=>field[+i].horse),count}));
+}
+function rtExoticEvaluation(counts,field,actualIndices,depth,trials){
+ if(actualIndices.length<depth||new Set(actualIndices.slice(0,depth)).size!==depth)return {available:false,reason:'Insufficient verified finishing order'};
+ const actual=actualIndices.slice(0,depth).join(',');
+ const topFive=rtRankedCombinations(counts,field);
+ const rank=topFive.findIndex(x=>x.horseIndices.join(',')===actual);
+ const actualCount=counts.get(actual)||0;
+ return {available:true,actualNumbers:actualIndices.slice(0,depth).map(i=>field[i].number),
+  actualHorses:actualIndices.slice(0,depth).map(i=>field[i].horse),
+  topFive,top1Hit:rank===0,top5Hit:rank>=0,top5Rank:rank>=0?rank+1:null,
+  actualCombinationCount:actualCount,actualCombinationProbability:actualCount/trials};
+}
 function rtCandidateScore(race,priorWeight,abilityWeight,trials,pace,variance){
-  const field=race.field,logs=rtSoftmaxLogShares(field,priorWeight);
-  const features=field.map(e=>{const m=horseMetrics(e);const style=m.e1!==null&&m.late!==null?Math.max(-.5,Math.min(.5,(m.e1-m.late)/35)):0;const ability=m.score!==null?(m.score-75)/20:0;return {style,ability};});
-  const rand=rtSeededRandom(rtSeedForRace(race));let spare=null;
-  const normal=()=>{if(spare!==null){const z=spare;spare=null;return z;}const u=Math.max(1e-12,rand()),v=rand(),mag=Math.sqrt(-2*Math.log(u));spare=mag*Math.sin(2*Math.PI*v);return mag*Math.cos(2*Math.PI*v);};
-  const noiseScale=.25+variance*1.4,wins=Array(field.length).fill(0),top3Counts=Array(field.length).fill(0);
-  for(let t=0;t<trials;t++){
-    const fieldFactor=normal()*.12;
-    const order=field.map((_,i)=>({i,v:logs[i]+features[i].ability*abilityWeight+features[i].style*(pace-.5)*1.25+fieldFactor*features[i].style+normal()*noiseScale}))
-      .sort((a,b)=>b.v-a.v).map(x=>x.i);
-    if(order.length){wins[order[0]]++;for(let k=0;k<Math.min(3,order.length);k++)top3Counts[order[k]]++;}
-  }
-  const wi=field.findIndex(e=>rtNormName(e.horse)===rtNormName(race.finishers[0]));if(wi<0)return null;
-  const actualTop3=new Set((race.top3Names||race.finishers.slice(0,3)).map(name=>field.findIndex(e=>rtNormName(e.horse)===rtNormName(name))).filter(i=>i>=0));
-  const winnerP=(wins[wi]+0.5)/(trials+field.length*0.5);
-  // Score all runners' top-three inclusion probabilities, not only the finishers named in the result.
-  let top3Loss=0;for(let i=0;i<field.length;i++){
-    const p=Math.max(1e-5,Math.min(1-1e-5,(top3Counts[i]+0.5)/(trials+1)));
-    top3Loss+=actualTop3.has(i)?-Math.log(p):-Math.log(1-p);
-  }
-  top3Loss/=Math.max(1,field.length);
-  return {winnerP,top3Loss,score:-Math.log(Math.max(1e-6,winnerP))+0.5*top3Loss,top3Counts,wins};
+ const field=race.field,logs=rtSoftmaxLogShares(field,priorWeight);
+ const features=field.map(e=>{const m=horseMetrics(e);const style=m.e1!==null&&m.late!==null?Math.max(-.5,Math.min(.5,(m.e1-m.late)/35)):0;const ability=m.score!==null?(m.score-75)/20:0;return {style,ability};});
+ const rand=rtSeededRandom(rtSeedForRace(race));let spare=null;
+ const normal=()=>{if(spare!==null){const z=spare;spare=null;return z;}const u=Math.max(1e-12,rand()),v=rand(),mag=Math.sqrt(-2*Math.log(u));spare=mag*Math.sin(2*Math.PI*v);return mag*Math.cos(2*Math.PI*v);};
+ const noiseScale=.25+variance*1.4,wins=Array(field.length).fill(0),top3Counts=Array(field.length).fill(0);
+ const exactas=new Map(),trifectas=new Map();
+ const bump=(map,key)=>map.set(key,(map.get(key)||0)+1);
+ for(let t=0;t<trials;t++){
+  const fieldFactor=normal()*.12;
+  const order=field.map((_,i)=>({i,v:logs[i]+features[i].ability*abilityWeight+features[i].style*(pace-.5)*1.25+fieldFactor*features[i].style+normal()*noiseScale}))
+   .sort((a,b)=>b.v-a.v).map(x=>x.i);
+  if(order.length){wins[order[0]]++;for(let k=0;k<Math.min(3,order.length);k++)top3Counts[order[k]]++;}
+  if(order.length>=2)bump(exactas,order.slice(0,2).join(','));
+  if(order.length>=3)bump(trifectas,order.slice(0,3).join(','));
+ }
+ const actualIndices=race.finishers.slice(0,3).map(name=>field.findIndex(e=>rtNormName(e.horse)===rtNormName(name)));
+ const wi=actualIndices[0];if(wi<0)return null;
+ const actualTop3=new Set(actualIndices.filter(i=>i>=0));
+ const winnerP=(wins[wi]+0.5)/(trials+field.length*0.5);
+ let top3Loss=0;for(let i=0;i<field.length;i++){
+  const p=Math.max(1e-5,Math.min(1-1e-5,(top3Counts[i]+0.5)/(trials+1)));
+  top3Loss+=actualTop3.has(i)?-Math.log(p):-Math.log(1-p);
+ }
+ top3Loss/=Math.max(1,field.length);
+ const exacta=rtExoticEvaluation(exactas,field,actualIndices,2,trials);
+ const trifecta=rtExoticEvaluation(trifectas,field,actualIndices,3,trials);
+ // Four official finishers are required to grade a superfecta. Never count it as a miss.
+ const superfecta={available:false,reason:'Archive stores only top-three official finishers; fourth place is unavailable',topFive:[],top1Hit:null,top5Hit:null,top5Rank:null};
+ return {winnerP,top3Loss,score:-Math.log(Math.max(1e-6,winnerP))+0.5*top3Loss,
+  top3Counts,wins,exacta,trifecta,superfecta};
 }
 function rtSetCalibrationStatus(message){const el=document.getElementById('calibrationStatus');if(el)el.textContent=message;}
 
@@ -633,6 +745,7 @@ async function runRaceTwinHistoricalCalibration(){
  const button=document.getElementById('autoCalibrateBtn'),legacy=document.getElementById('historicalBacktestBtn');
  if(window.rtAutoCalBusy)return;
  const dataset=rtArchiveDataset(),races=dataset.matched.filter(rtArchiveEligible);
+ rtSetCalibrationStatus(`Historical-only audit: ${races.length} eligible resulted races; ${dataset.exclusions.length} results-only races without BRIS cards; ${dataset.excludedUnresultedCards} unresulted BRIS horse entries excluded. No current-race data is used.`);
  const dates=[...new Set(races.map(r=>r.date))].sort();
  if(races.length<12||dates.length<3){
   rtSetCalibrationStatus(`Calibration not applied: ${races.length} verified races across ${dates.length} dates. Need at least 12 races and 3 distinct dates for chronological validation. ${dataset.exclusions.length} result-only races have no matching BRIS card.`);
@@ -651,27 +764,32 @@ async function runRaceTwinHistoricalCalibration(){
  const candidates=[];
  for(const priorWeight of priors)for(const abilityWeight of abilities)candidates.push({priorWeight,abilityWeight});
  const score=(r,m)=>rtCandidateScore(r,m.priorWeight,m.abilityWeight,trials,pace,variance);
- const avg=(rows,m)=>{let sum=0,used=0,hits=0,brier=0;
+ const avg=(rows,m)=>{let sum=0,used=0,hits=0,brier=0,exactaHits=0,trifectaHits=0,exactaN=0,trifectaN=0;
   for(const r of rows){const x=score(r,m);if(!x)continue;
    const winner=r.field.findIndex(e=>rtNormName(e.horse)===rtNormName(r.finishers[0]));
    const probs=x.wins.map(v=>v/trials);
    brier+=probs.reduce((a,p,i)=>a+(p-(i===winner?1:0))**2,0);
    sum+=-Math.log(Math.max(1e-9,x.winnerP));
-   hits+=Number(x.wins.indexOf(Math.max(...x.wins))===winner);used++;
+   hits+=Number(x.wins.indexOf(Math.max(...x.wins))===winner);
+   if(x.exacta.available){exactaN++;exactaHits+=Number(x.exacta.top5Hit)}
+   if(x.trifecta.available){trifectaN++;trifectaHits+=Number(x.trifecta.top5Hit)}
+   used++;
   }
-  return {logLoss:used?sum/used:Infinity,brier:used?brier/used:Infinity,hitRate:used?hits/used:0,n:used};
+  return {logLoss:used?sum/used:Infinity,brier:used?brier/used:Infinity,hitRate:used?hits/used:0,
+   exactaTop5:exactaN?exactaHits/exactaN:null,trifectaTop5:trifectaN?trifectaHits/trifectaN:null,
+   exoticComposite:used?sum/used+0.25*(1-exactaHits/Math.max(1,exactaN))+0.15*(1-trifectaHits/Math.max(1,trifectaN)):Infinity,n:used};
  };
  window.rtAutoCalBusy=true;
  if(button)button.disabled=true;if(legacy)legacy.disabled=true;
  const toggle=document.getElementById('enableCalibration');
  if(toggle)toggle.checked=false;
  try{
-  rtSetCalibrationStatus(`Auto-calibration: ${train.length} training races (${dates.slice(0,split).join(', ')}) / ${test.length} later-date holdout races. Testing ${candidates.length} settings, ${trials.toLocaleString()} trials per race.`);
+  rtSetCalibrationStatus(`Historical results ONLY · ${dataset.excludedUnresultedCards} unresulted horse entries excluded. Auto-calibration: ${train.length} training races (${dates.slice(0,split).join(', ')}) / ${test.length} later-date holdout races. Testing ${candidates.length} settings using winner loss and top-five exacta/trifecta hits, ${trials.toLocaleString()} trials per race.`);
   const baseTest=avg(test,baseline),baseTrain=avg(train,baseline);
   let best=baseline,bestTrain=baseTrain;
   for(let i=0;i<candidates.length;i++){
    const model=candidates[i],metric=avg(train,model);
-   if(metric.logLoss<bestTrain.logLoss-1e-6){best=model;bestTrain=metric;}
+   if(metric.exoticComposite<bestTrain.exoticComposite-1e-6){best=model;bestTrain=metric;}
    if(i%2===1){
     rtSetCalibrationStatus(`Fitting archived simulations ${i+1}/${candidates.length} · ${train.length} training races · ${test.length} untouched holdout races.`);
     await new Promise(resolve=>setTimeout(resolve,0));
@@ -681,14 +799,14 @@ async function runRaceTwinHistoricalCalibration(){
   // Do not promote a candidate merely for improving the training races.
   // Require a meaningful holdout gain, no large Brier regression, and no reduction in pick rate beyond noise.
   const improves=best.priorWeight!==baseline.priorWeight||best.abilityWeight!==baseline.abilityWeight;
-  const accepted=improves&&fittedTest.logLoss+0.01<baseTest.logLoss&&fittedTest.brier<=baseTest.brier+.005;
+  const accepted=improves&&fittedTest.exoticComposite+0.01<baseTest.exoticComposite&&fittedTest.logLoss<=baseTest.logLoss+.015&&fittedTest.brier<=baseTest.brier+.005;
   const record={priorWeight:accepted?best.priorWeight:baseline.priorWeight,
    abilityWeight:accepted?best.abilityWeight:baseline.abilityWeight,
    verified:accepted,validated:accepted,trainedRaces:train.length,holdoutRaces:test.length,
    trainedAt:new Date().toISOString(),trialsPerSetting:trials,
    trainDates:dates.slice(0,split),holdoutDates:dates.slice(split),
    baselineTrain:baseTrain,baselineHoldout:baseTest,candidateTrain:bestTrain,candidateHoldout:fittedTest,
-   candidateWeights:best,decision:accepted?'ACCEPTED':'REJECTED',archiveVersion:4};
+   candidateWeights:best,decision:accepted?'ACCEPTED':'REJECTED',archiveVersion:6,calibrationInputPolicy:'UPLOADED_RESULTS_ONLY',excludedUnresultedCardEntries:dataset.excludedUnresultedCards};
   const saved=writeRaceTwinCalibration(record);
   if(toggle)toggle.checked=accepted;
   const fmt=x=>Number.isFinite(x)?x.toFixed(4):'—';
@@ -696,16 +814,19 @@ async function runRaceTwinHistoricalCalibration(){
   if(metrics)metrics.innerHTML=`<table><thead><tr><th>Holdout metric</th><th>Original</th><th>Fitted candidate</th></tr></thead><tbody>
   <tr><td>Winner log loss ↓</td><td>${fmt(baseTest.logLoss)}</td><td>${fmt(fittedTest.logLoss)}</td></tr>
   <tr><td>Multiclass Brier ↓</td><td>${fmt(baseTest.brier)}</td><td>${fmt(fittedTest.brier)}</td></tr>
-  <tr><td>Top pick accuracy ↑</td><td>${(baseTest.hitRate*100).toFixed(1)}%</td><td>${(fittedTest.hitRate*100).toFixed(1)}%</td></tr></tbody></table>
-  <p class="muted small">Training: ${train.length} races · holdout: ${test.length} races across later dates · ${trials.toLocaleString()} simulations per race/setting. Candidate weights: prior ${best.priorWeight.toFixed(2)}, BRIS ability ${best.abilityWeight.toFixed(2)}. ${accepted?'Accepted for live-race batch simulations.':'Rejected; original weights retained.'} This is a small historical sample, not proof of future accuracy.</p>`;
-  rtSetCalibrationStatus(`${accepted?'VALIDATED CANDIDATE ACTIVE':'CANDIDATE REJECTED — ORIGINAL ENGINE ACTIVE'} · ${train.length} training / ${test.length} later-date test races · ${dataset.exclusions.length} results-only races excluded · ${saved?'Saved in this browser.':'Browser storage unavailable; settings will not persist.'}`);
+  <tr><td>Top pick accuracy ↑</td><td>${(baseTest.hitRate*100).toFixed(1)}%</td><td>${(fittedTest.hitRate*100).toFixed(1)}%</td></tr>
+  <tr><td>Top-5 exacta hits ↑</td><td>${(100*(baseTest.exactaTop5||0)).toFixed(1)}%</td><td>${(100*(fittedTest.exactaTop5||0)).toFixed(1)}%</td></tr>
+  <tr><td>Top-5 trifecta hits ↑</td><td>${(100*(baseTest.trifectaTop5||0)).toFixed(1)}%</td><td>${(100*(fittedTest.trifectaTop5||0)).toFixed(1)}%</td></tr>
+  <tr><td>Combined calibration score ↓</td><td>${fmt(baseTest.exoticComposite)}</td><td>${fmt(fittedTest.exoticComposite)}</td></tr></tbody></table>
+  <p class="muted small">Historical-only training. Unresulted cards excluded: ${dataset.excludedUnresultedCards} horse entries. Training: ${train.length} races · holdout: ${test.length} races across later dates · ${trials.toLocaleString()} simulations per race/setting. Candidate weights: prior ${best.priorWeight.toFixed(2)}, BRIS ability ${best.abilityWeight.toFixed(2)}. ${accepted?'Accepted for live-race batch simulations.':'Rejected; original weights retained.'} This is a small historical sample, not proof of future accuracy.</p>`;
+  rtSetCalibrationStatus(`${accepted?'HISTORICALLY VALIDATED SETTINGS ACTIVE':'CANDIDATE REJECTED — ORIGINAL ENGINE ACTIVE'} · ${train.length} training / ${test.length} later-date test races · ${dataset.exclusions.length} results-only races excluded · ${saved?'Saved in this browser.':'Browser storage unavailable; settings will not persist.'}`);
  }catch(e){if(toggle)toggle.checked=false;rtSetCalibrationStatus('Auto-calibration failed: '+(e?.message||String(e)));}
  finally{window.rtAutoCalBusy=false;if(button)button.disabled=false;if(legacy)legacy.disabled=false;}
 }
 // Archived race evaluation is independent of the original simulation button.
 let rtArchiveCancel=false,rtArchiveBusy=false,rtArchiveReport=null;
 function rtArchiveEligible(r){
- return r.verifiedStarters&&r.allTop3Matched&&r.field.length>=2;
+ return r.verifiedStarters&&r.allTop3Matched&&r.field.length>=3&&Array.isArray(r.finishers)&&r.finishers.length>=3;
 }
 function rtArchiveMetrics(rows,which){
  const valid=rows.filter(r=>r.eligible&&r.models?.[which]);
@@ -713,7 +834,12 @@ function rtArchiveMetrics(rows,which){
  const avg=(key)=>valid.reduce((a,r)=>a+r.models[which][key],0)/valid.length;
  return {races:valid.length,meanWinnerLogLoss:+avg('logLoss').toFixed(5),
   meanMulticlassBrier:+avg('brier').toFixed(5),topPickAccuracy:+avg('topPickHit').toFixed(5),
-  meanWinnerProbability:+avg('winnerProbability').toFixed(5)};
+  meanWinnerProbability:+avg('winnerProbability').toFixed(5),
+  exactaTop5Hits:valid.filter(r=>r.models[which].exotics?.exacta?.top5Hit).length,
+  trifectaTop5Hits:valid.filter(r=>r.models[which].exotics?.trifecta?.top5Hit).length,
+  exactaTop5Rate:valid.filter(r=>r.models[which].exotics?.exacta?.available).length?valid.filter(r=>r.models[which].exotics?.exacta?.top5Hit).length/valid.filter(r=>r.models[which].exotics?.exacta?.available).length:null,
+  trifectaTop5Rate:valid.filter(r=>r.models[which].exotics?.trifecta?.available).length?valid.filter(r=>r.models[which].exotics?.trifecta?.top5Hit).length/valid.filter(r=>r.models[which].exotics?.trifecta?.available).length:null,
+  superfectaTop5Rate:null};
 }
 function rtArchiveOne(r,model,trials,pace,variance){
  const scored=rtCandidateScore(r,model.priorWeight,model.abilityWeight,trials,pace,variance);
@@ -726,6 +852,7 @@ function rtArchiveOne(r,model,trials,pace,variance){
   winnerProbability:+probs[winner].toFixed(6),
   logLoss:+(-Math.log(Math.max(1e-9,(scored.wins[winner]+0.5)/(trials+n*.5)))).toFixed(6),
   brier:+brier.toFixed(6),
+  exotics:{exacta:scored.exacta,trifecta:scored.trifecta,superfecta:scored.superfecta},
   runners:r.field.map((e,i)=>{
    const m=horseMetrics(e),finished=r.finishers.findIndex(name=>rtNormName(name)===rtNormName(e.horse));
    return {number:e.number,horse:e.horse,post:e.post,morningLine:e.ml??null,
@@ -746,7 +873,10 @@ function rtArchiveDataset(){
    officialStarters:record.starters,officialScratches:record.scratches,
    actualTopThree:record.finishers,source:record.source,duplicateSources:record.duplicateSources});
  }
- return {matched,exclusions};
+ return {matched,exclusions,sourcePolicy:'UPLOADED_RESULTS_ONLY',
+  verifiedEligible:matched.filter(rtArchiveEligible).length,
+  resultRecordCount:rtCanonicalHistoricalResults().length,
+  excludedUnresultedCards:cards.reduce((n,c)=>n+c.entries.filter(e=>!rtCanonicalHistoricalResults().some(r=>r.date===rtCanonicalDate(e.date)&&r.track===rtCanonicalTrack(e.track)&&r.race===Number(e.race))).length,0)};
 }
 $('archiveRunBtn').onclick=async()=>{
  if(rtArchiveBusy)return;
@@ -782,11 +912,13 @@ $('archiveRunBtn').onclick=async()=>{
    await new Promise(resolve=>setTimeout(resolve,0));
   }
   const summary={baseline:rtArchiveMetrics(rows,'baseline'),candidate:rtArchiveMetrics(rows,'candidate')};
-  rtArchiveReport={format:'RaceTwinArchiveCalibrationReport',version:3,generatedAt:now,
+  rtArchiveReport={format:'RaceTwinArchiveCalibrationReport',version:4,generatedAt:now,
    trialsPerRacePerModel:trials,paceSetting:pace,varianceSetting:variance,
    candidateCalibrationVerified:saved.verified===true,
-   warning:'All races with complete matched starter lists are simulated after automatic historical scratching. Missing BRIS cards are exported as exclusions, never invented. Saved candidate weights may have been fitted using these same races. This is not independent validation.',
+   warning:'Top-five exacta and trifecta are compared against actual ordered top three. Superfecta is not graded because official fourth place is unavailable. All races with complete matched starter lists are simulated after automatic historical scratching. Missing BRIS cards are exported as exclusions, never invented. Saved candidate weights may have been fitted using these same races. This is not independent validation.',
    summary,totalResultRaces:races.length+dataset.exclusions.length,
+   calibrationInputPolicy:'UPLOADED_RESULTS_ONLY',
+   unresultedCardEntriesExcluded:dataset.excludedUnresultedCards,
    totalSimulatedTrials:rows.filter(x=>x.eligible).length*trials*2,
    matchedRaces:races.length,eligibleRaces:rows.filter(x=>x.eligible).length,
    excludedMatchedRaces:rows.filter(x=>!x.eligible).length,
@@ -799,7 +931,10 @@ $('archiveRunBtn').onclick=async()=>{
    <tr><td>Eligible races</td><td>${summary.baseline.races}</td><td>${summary.candidate.races}</td></tr>
    <tr><td>Winner log loss (lower)</td><td>${f(summary.baseline.meanWinnerLogLoss)}</td><td>${f(summary.candidate.meanWinnerLogLoss)}</td></tr>
    <tr><td>Multiclass Brier (lower)</td><td>${f(summary.baseline.meanMulticlassBrier)}</td><td>${f(summary.candidate.meanMulticlassBrier)}</td></tr>
-   <tr><td>Top pick hit rate (higher)</td><td>${f(summary.baseline.topPickAccuracy*100)}%</td><td>${f(summary.candidate.topPickAccuracy*100)}%</td></tr></tbody></table>`;
+   <tr><td>Top pick hit rate (higher)</td><td>${f(summary.baseline.topPickAccuracy*100)}%</td><td>${f(summary.candidate.topPickAccuracy*100)}%</td></tr>
+   <tr><td>Top-5 exacta hits (higher)</td><td>${summary.baseline.exactaTop5Hits} / ${summary.baseline.races}</td><td>${summary.candidate.exactaTop5Hits} / ${summary.candidate.races}</td></tr>
+   <tr><td>Top-5 trifecta hits (higher)</td><td>${summary.baseline.trifectaTop5Hits} / ${summary.baseline.races}</td><td>${summary.candidate.trifectaTop5Hits} / ${summary.candidate.races}</td></tr>
+   <tr><td>Top-5 superfecta hits</td><td colspan='2'>Not scoreable: official fourth-place results not stored</td></tr></tbody></table>`;
  }catch(e){$('archiveStatus').textContent='Archive run failed: '+String(e.message||e)}
  finally{rtArchiveBusy=false;$('archiveRunBtn').disabled=false}
 };
