@@ -60,9 +60,9 @@ table{width:100%;border-collapse:collapse;font-size:12px}th{text-align:left;colo
     <label class="muted small" for="historicalTrials">Trials per race / setting</label>
     <select id="historicalTrials" style="background:#284156;color:white;padding:9px;border:1px solid #4a667a;border-radius:5px"><option value="600">600 · faster</option><option value="1200" selected>1,200 · balanced</option><option value="2500">2,500 · slower</option></select>
     <button id="historicalBacktestBtn" class="primary">RUN BACKTEST & CALIBRATE</button>
-    <button id="resetCalibrationBtn">RESET CALIBRATION</button><label class="muted small"><input type="checkbox" id="enableCalibration"> APPLY VERIFIED CALIBRATION TO MAIN MONTE CARLO</label>
+    <button id="autoCalibrateBtn" class="primary">RUN ARCHIVES & AUTO-CALIBRATE</button><button id="resetCalibrationBtn">RESET CALIBRATION</button><label class="muted small"><input type="checkbox" id="enableCalibration"> USE VALIDATED CALIBRATION FOR CURRENT RACES</label>
   </div>
-  <div id="calibrationStatus" class="status">Original weights remain active: prior 0.55, ability 0.85. Calibration requires complete official starter lists. This example supplies eight races; any fitted weights are provisional and should be validated on additional dates.</div>
+  <p class="muted small">Auto-calibration runs archived race trials after verified scratches, fits on older dates, tests on later dates, and activates weights only if holdout log loss improves. Current race results are never used. Keep the original engine if validation fails.</p><div id="calibrationStatus" class="status">Original weights remain active: prior 0.55, ability 0.85. Calibration requires complete official starter lists. This example supplies eight races; any fitted weights are provisional and should be validated on additional dates.</div>
   <div id="calibrationMetrics" style="margin-top:10px;overflow:auto"></div>
   <p class="muted small" style="line-height:1.6;margin-top:10px">Important: this is a limited calibration, not proof of profitable wagering. The embedded historical data now includes verified starter/scratch lists for the eight Oct 14 races, but does not yet include every race's complete finish order, payouts, or confirmed scratches. For scratch-correct backtests, add official starter lists or explicit scratched-horse lists to the archive.</p>
 </section>
@@ -217,7 +217,7 @@ function cancelBatch(message){
 }
 function makeBatchContext(){
  const active=activeIndices(),weights=oddsWeights(),pace=+$('pace').value/100,variance=+$('variance').value/100;
- const cal=(document.getElementById('enableCalibration')?.checked&&readRaceTwinCalibration().verified===true)?readRaceTwinCalibration():{priorWeight:0.55,abilityWeight:0.85};
+ const cal=(document.getElementById('enableCalibration')?.checked&&readRaceTwinCalibration().validated===true)?readRaceTwinCalibration():{priorWeight:0.55,abilityWeight:0.85};
  const archiveStrength=document.getElementById('archiveFitToggle')?.checked?1.2807:1;
  return {pace,variance,archiveStrength,runners:active.map(i=>{const m=horseMetrics(entries[i]),p=weights[i],style=m.e1!==null&&m.late!==null?Math.max(-.5,Math.min(.5,(m.e1-m.late)/35)):0,ability=m.score!==null?(m.score-75)/20:0;return {i,logShare:Math.log(Math.max(.001,p))*cal.priorWeight,ability:ability*cal.abilityWeight,style};})};
 }
@@ -628,52 +628,80 @@ function rtCandidateScore(race,priorWeight,abilityWeight,trials,pace,variance){
   return {winnerP,top3Loss,score:-Math.log(Math.max(1e-6,winnerP))+0.5*top3Loss,top3Counts,wins};
 }
 function rtSetCalibrationStatus(message){const el=document.getElementById('calibrationStatus');if(el)el.textContent=message;}
-async function runRaceTwinHistoricalCalibration(){
-  const btn=document.getElementById('historicalBacktestBtn');if(btn.disabled)return;
-  const allRaces=rtVerifiedHistoricalRaces();
-  const races=allRaces.filter(r=>r.verifiedStarters&&r.allTop3Matched);
-  if(!races.length){rtSetCalibrationStatus(`Calibration blocked: ${allRaces.length} archived races have matched results, but none has a complete verified starter list and matched top-three finishers. Add verified starters/scratches before fitting. No weights changed.`);return;}
-  if(races.length<6){rtSetCalibrationStatus(`Only ${races.length} fully verified races are available. At least 6 are required for a provisional diagnostic fit; add more independent official starter lists.`);return;}
-  const trials=Math.max(300,Number(document.getElementById('historicalTrials').value)||1200);
-  const splitAt=Math.max(1,Math.min(races.length-2,Math.floor(races.length*0.70)));
-  const trainRaces=races.slice(0,splitAt),holdoutRaces=races.slice(splitAt);
-  // Fit both parameters that actually affect the production simulator. Same deterministic random stream
-  // per race across candidates prevents random noise from choosing the winning parameter pair.
-  const priorWeights=[0.20,0.35,0.50,0.65,0.80,0.95,1.10,1.25];
-  const abilityWeights=[0.30,0.50,0.70,0.85,1.00,1.20,1.40];
-  const pace=(Number(document.getElementById('pace')?.value)||50)/100;
-  const variance=(Number(document.getElementById('variance')?.value)||50)/100;
-  btn.disabled=true;btn.textContent='CALIBRATING…';
-  const previous=readRaceTwinCalibration();rtSetCalibrationStatus(`Testing ${priorWeights.length*abilityWeights.length} parameter pairs on ${trainRaces.length} training races · ${trials.toLocaleString()} deterministic trials per race and pair.`);
-  const scores=[];let completed=0;
-  try{
-    for(const priorWeight of priorWeights){for(const abilityWeight of abilityWeights){
-      let loss=0,hits=0,used=0;
-      for(const race of trainRaces){
-        const result=rtCandidateScore(race,priorWeight,abilityWeight,trials,pace,variance);if(!result)continue;
-        loss+=result.score;
-        const predictedIndex=result.wins.indexOf(Math.max(...result.wins));
-        if(rtNormName(race.field[predictedIndex]?.horse)===rtNormName(race.finishers[0]))hits++;
-        used++;
-      }
-      if(used){const meanLoss=loss/used;const regularized=meanLoss+0.006*Math.pow(priorWeight-0.55,2)+0.003*Math.pow(abilityWeight-0.85,2);scores.push({priorWeight,abilityWeight,score:meanLoss,adjustedLoss:regularized,hitRate:hits/used,used});}
-      completed++;
-      if(completed%4===0){rtSetCalibrationStatus(`Testing parameter pairs: ${completed}/${priorWeights.length*abilityWeights.length} · ${trainRaces.length} training races.`);await new Promise(resolve=>setTimeout(resolve,0));}
-    }}
-    if(!scores.length)throw new Error('No races could be scored.');
-    scores.sort((a,b)=>a.adjustedLoss-b.adjustedLoss);const best=scores[0];
-    let holdoutLoss=0,holdoutHits=0,holdoutUsed=0;
-    for(const race of holdoutRaces){const r=rtCandidateScore(race,best.priorWeight,best.abilityWeight,trials,pace,variance);if(r){holdoutLoss+=r.score;const pi=r.wins.indexOf(Math.max(...r.wins));if(rtNormName(race.field[pi]?.horse)===rtNormName(race.finishers[0]))holdoutHits++;holdoutUsed++;}await new Promise(resolve=>setTimeout(resolve,0));}
-    holdoutLoss=holdoutUsed?holdoutLoss/holdoutUsed:null;
-    const result={verified:true,provisional:races.length<30,priorWeight:best.priorWeight,abilityWeight:best.abilityWeight,trainedRaces:best.used,holdoutRaces:holdoutUsed,trainedAt:new Date().toISOString(),logLoss:best.score,holdoutLogLoss:holdoutLoss,hitRate:best.hitRate,holdoutHitRate:holdoutUsed?holdoutHits/holdoutUsed:null,trialsPerSetting:trials,archiveVersion:2};
-    const saved=writeRaceTwinCalibration(result);const knownScratchRaces=races.filter(r=>r.scratchKnown).length;
-    const metrics=document.getElementById('calibrationMetrics');
-    if(metrics){const top=scores.slice(0,12);const rowsHtml=top.map((x,i)=>`<tr${i===0?' style="font-weight:800;color:#87e3b5"':''}><td>${i+1}${i===0?' · selected':''}</td><td>${x.priorWeight.toFixed(2)}</td><td>${x.abilityWeight.toFixed(2)}</td><td>${x.score.toFixed(4)}</td><td>${(x.hitRate*100).toFixed(1)}%</td></tr>`).join('');metrics.innerHTML=`<table><thead><tr><th>Rank</th><th>Prior weight</th><th>Ability weight</th><th>Training loss</th><th>Training winner hit rate</th></tr></thead><tbody>${rowsHtml}</tbody></table><p class="muted small" style="margin-top:8px">Chronological holdout: ${holdoutUsed} races · loss ${holdoutLoss===null?'not available':holdoutLoss.toFixed(4)} · winner hit rate ${holdoutUsed?(100*holdoutHits/holdoutUsed).toFixed(1)+'%':'not available'}. Top 12 of ${scores.length} parameter pairs shown. A tiny archive can still overfit.</p>`;}
-    rtSetCalibrationStatus(`${saved?'Provisional calibration saved':'Calibration calculated, but browser storage is unavailable'} · prior ${best.priorWeight.toFixed(2)} · ability ${best.abilityWeight.toFixed(2)} (previous ${previous.priorWeight.toFixed(2)}/${previous.abilityWeight.toFixed(2)}) · trained on ${best.used} races · holdout ${holdoutUsed} races (loss ${holdoutLoss===null?'—':holdoutLoss.toFixed(4)}) · scratch records verified for ${knownScratchRaces}/${races.length} races.`);
-  }catch(err){rtSetCalibrationStatus('Calibration failed: '+(err?.message||String(err)));}
-  finally{btn.disabled=false;btn.textContent='RUN BACKTEST & CALIBRATE';}
-}
 
+async function runRaceTwinHistoricalCalibration(){
+ const button=document.getElementById('autoCalibrateBtn'),legacy=document.getElementById('historicalBacktestBtn');
+ if(window.rtAutoCalBusy)return;
+ const dataset=rtArchiveDataset(),races=dataset.matched.filter(rtArchiveEligible);
+ const dates=[...new Set(races.map(r=>r.date))].sort();
+ if(races.length<12||dates.length<3){
+  rtSetCalibrationStatus(`Calibration not applied: ${races.length} verified races across ${dates.length} dates. Need at least 12 races and 3 distinct dates for chronological validation. ${dataset.exclusions.length} result-only races have no matching BRIS card.`);
+  return;
+ }
+ const split=Math.max(1,Math.min(dates.length-1,Math.floor(dates.length*.7)));
+ const cutoff=dates[split],train=races.filter(r=>r.date<cutoff),test=races.filter(r=>r.date>=cutoff);
+ if(train.length<8||test.length<4){
+  rtSetCalibrationStatus(`Calibration not applied: chronological split has ${train.length} training and ${test.length} test races; need at least 8/4.`);
+  return;
+ }
+ const trials=Math.max(500,Math.min(10000,Number(document.getElementById('historicalTrials')?.value)||1200));
+ const pace=.5,variance=.5;
+ const baseline={priorWeight:.55,abilityWeight:.85};
+ const priors=[.3,.45,.55,.7,.85,1.05,1.25],abilities=[.3,.55,.7,.85,1.05,1.3];
+ const candidates=[];
+ for(const priorWeight of priors)for(const abilityWeight of abilities)candidates.push({priorWeight,abilityWeight});
+ const score=(r,m)=>rtCandidateScore(r,m.priorWeight,m.abilityWeight,trials,pace,variance);
+ const avg=(rows,m)=>{let sum=0,used=0,hits=0,brier=0;
+  for(const r of rows){const x=score(r,m);if(!x)continue;
+   const winner=r.field.findIndex(e=>rtNormName(e.horse)===rtNormName(r.finishers[0]));
+   const probs=x.wins.map(v=>v/trials);
+   brier+=probs.reduce((a,p,i)=>a+(p-(i===winner?1:0))**2,0);
+   sum+=-Math.log(Math.max(1e-9,x.winnerP));
+   hits+=Number(x.wins.indexOf(Math.max(...x.wins))===winner);used++;
+  }
+  return {logLoss:used?sum/used:Infinity,brier:used?brier/used:Infinity,hitRate:used?hits/used:0,n:used};
+ };
+ window.rtAutoCalBusy=true;
+ if(button)button.disabled=true;if(legacy)legacy.disabled=true;
+ const toggle=document.getElementById('enableCalibration');
+ if(toggle)toggle.checked=false;
+ try{
+  rtSetCalibrationStatus(`Auto-calibration: ${train.length} training races (${dates.slice(0,split).join(', ')}) / ${test.length} later-date holdout races. Testing ${candidates.length} settings, ${trials.toLocaleString()} trials per race.`);
+  const baseTest=avg(test,baseline),baseTrain=avg(train,baseline);
+  let best=baseline,bestTrain=baseTrain;
+  for(let i=0;i<candidates.length;i++){
+   const model=candidates[i],metric=avg(train,model);
+   if(metric.logLoss<bestTrain.logLoss-1e-6){best=model;bestTrain=metric;}
+   if(i%2===1){
+    rtSetCalibrationStatus(`Fitting archived simulations ${i+1}/${candidates.length} · ${train.length} training races · ${test.length} untouched holdout races.`);
+    await new Promise(resolve=>setTimeout(resolve,0));
+   }
+  }
+  const fittedTest=avg(test,best);
+  // Do not promote a candidate merely for improving the training races.
+  // Require a meaningful holdout gain, no large Brier regression, and no reduction in pick rate beyond noise.
+  const improves=best.priorWeight!==baseline.priorWeight||best.abilityWeight!==baseline.abilityWeight;
+  const accepted=improves&&fittedTest.logLoss+0.01<baseTest.logLoss&&fittedTest.brier<=baseTest.brier+.005;
+  const record={priorWeight:accepted?best.priorWeight:baseline.priorWeight,
+   abilityWeight:accepted?best.abilityWeight:baseline.abilityWeight,
+   verified:accepted,validated:accepted,trainedRaces:train.length,holdoutRaces:test.length,
+   trainedAt:new Date().toISOString(),trialsPerSetting:trials,
+   trainDates:dates.slice(0,split),holdoutDates:dates.slice(split),
+   baselineTrain:baseTrain,baselineHoldout:baseTest,candidateTrain:bestTrain,candidateHoldout:fittedTest,
+   candidateWeights:best,decision:accepted?'ACCEPTED':'REJECTED',archiveVersion:4};
+  const saved=writeRaceTwinCalibration(record);
+  if(toggle)toggle.checked=accepted;
+  const fmt=x=>Number.isFinite(x)?x.toFixed(4):'—';
+  const metrics=document.getElementById('calibrationMetrics');
+  if(metrics)metrics.innerHTML=`<table><thead><tr><th>Holdout metric</th><th>Original</th><th>Fitted candidate</th></tr></thead><tbody>
+  <tr><td>Winner log loss ↓</td><td>${fmt(baseTest.logLoss)}</td><td>${fmt(fittedTest.logLoss)}</td></tr>
+  <tr><td>Multiclass Brier ↓</td><td>${fmt(baseTest.brier)}</td><td>${fmt(fittedTest.brier)}</td></tr>
+  <tr><td>Top pick accuracy ↑</td><td>${(baseTest.hitRate*100).toFixed(1)}%</td><td>${(fittedTest.hitRate*100).toFixed(1)}%</td></tr></tbody></table>
+  <p class="muted small">Training: ${train.length} races · holdout: ${test.length} races across later dates · ${trials.toLocaleString()} simulations per race/setting. Candidate weights: prior ${best.priorWeight.toFixed(2)}, BRIS ability ${best.abilityWeight.toFixed(2)}. ${accepted?'Accepted for live-race batch simulations.':'Rejected; original weights retained.'} This is a small historical sample, not proof of future accuracy.</p>`;
+  rtSetCalibrationStatus(`${accepted?'VALIDATED CANDIDATE ACTIVE':'CANDIDATE REJECTED — ORIGINAL ENGINE ACTIVE'} · ${train.length} training / ${test.length} later-date test races · ${dataset.exclusions.length} results-only races excluded · ${saved?'Saved in this browser.':'Browser storage unavailable; settings will not persist.'}`);
+ }catch(e){if(toggle)toggle.checked=false;rtSetCalibrationStatus('Auto-calibration failed: '+(e?.message||String(e)));}
+ finally{window.rtAutoCalBusy=false;if(button)button.disabled=false;if(legacy)legacy.disabled=false;}
+}
 // Archived race evaluation is independent of the original simulation button.
 let rtArchiveCancel=false,rtArchiveBusy=false,rtArchiveReport=null;
 function rtArchiveEligible(r){
@@ -789,14 +817,16 @@ $('archiveDownloadBtn').onclick=()=>{
 };
 
 document.getElementById('historicalBacktestBtn')?.addEventListener('click',runRaceTwinHistoricalCalibration);
+document.getElementById('autoCalibrateBtn')?.addEventListener('click',runRaceTwinHistoricalCalibration);
 document.getElementById('resetCalibrationBtn')?.addEventListener('click',()=>{
   try{localStorage.removeItem(RACETWIN_CALIBRATION_KEY);}catch(_){}
+  const toggle=document.getElementById('enableCalibration');if(toggle)toggle.checked=false;
   const el=document.getElementById('calibrationMetrics');if(el)el.innerHTML='';
   rtSetCalibrationStatus('Calibration reset. Future simulations use default prior 0.55 and ability 0.85 weights.');
 });
 (function showSavedRaceTwinCalibration(){
   const c=readRaceTwinCalibration();
-  if(c.trainedAt)rtSetCalibrationStatus(`Loaded saved calibration · prior weight ${Number(c.priorWeight).toFixed(2)} · trained on ${c.trainedRaces||0} matched races · ${new Date(c.trainedAt).toLocaleString()}.`);
+  if(c.trainedAt&&c.validated===true){const toggle=document.getElementById('enableCalibration');if(toggle)toggle.checked=true;rtSetCalibrationStatus(`Loaded validated calibration · prior weight ${Number(c.priorWeight).toFixed(2)} · trained on ${c.trainedRaces||0} matched races · ${new Date(c.trainedAt).toLocaleString()}.`);}
 })();
 
 </script></body></html>
