@@ -174,7 +174,7 @@ function avg(a,n=3){let v=(a||[]).filter(x=>Number.isFinite(x)&&x>0).slice(0,n);
 function horseMetrics(e){
  const b=e.bris||{},speed=avg(b.speed),e1=avg(b.e1),e2=avg(b.e2),late=avg(b.late);
  const available=[speed,e1,e2,late].filter(Number.isFinite);
- const form=(b.speed||[]).filter(Number.isFinite).slice(0,5);
+ const form=(b.speed||[]).filter(x=>Number.isFinite(x)&&x>0).slice(0,5);
  const trend=form.length>=3?form[0]-form.slice(1).reduce((a,b)=>a+b,0)/(form.length-1):null;
  const completeness=available.length;
  // Scores deliberately bounded; no unknown metric is substituted with a zero.
@@ -533,32 +533,69 @@ function readRaceTwinCalibration(){
 }
 function writeRaceTwinCalibration(v){try{localStorage.setItem(RACETWIN_CALIBRATION_KEY,JSON.stringify(v));return true;}catch(_){return false;}}
 function rtNormName(s){return String(s||'').normalize('NFKD').replace(/[\u0300-\u036f]/g,'').toUpperCase().trim().replace(/\s*\((?:IRE|GB|FR|GER|JPN|ARG|BRZ|CAN|AUS|NZ|CHI|URU|SAF|ITY|USA)\)\s*$/,'').replace(/[^A-Z0-9]/g,'');}
-function rtFindCard(track,date){const d=String(date).replace(/[^0-9]/g,'');const t=String(track).toUpperCase().replace(/[^A-Z]/g,'');return cards.find(c=>c.entries.some(e=>String(e.track).toUpperCase().replace(/[^A-Z]/g,'')===t&&String(e.date).replace(/[^0-9]/g,'')===d));}
-function rtVerifiedHistoricalRaces(){
- const out=[];
+function rtCanonicalDate(value){
+ const d=String(value||'').replace(/\\D/g,'');
+ if(d.length!==8)return d;
+ if(d.startsWith('20'))return d;
+ if(d.slice(4).startsWith('20'))return d.slice(4)+d.slice(0,4);
+ return d;
+}
+function rtCanonicalTrack(value){
+ const t=String(value||'').toUpperCase().replace(/[^A-Z]/g,'');
+ return ({KEENELAND:'KEE',BELMONT:'BEL',BELMONTATTHEBIGA:'BEL',GULFSTREAM:'GP',GULFSTREAMPARK:'GP',GPX:'GP',INDIANA:'IND',INDIANAGRAND:'IND',HORSESHOEINDIANAPOLIS:'IND'})[t]||t;
+}
+function rtFindCard(track,date){
+ const d=rtCanonicalDate(date),t=rtCanonicalTrack(track);
+ return cards.find(c=>c.entries.some(e=>rtCanonicalTrack(e.track)===t&&rtCanonicalDate(e.date)===d));
+}
+// Merge result records by canonical track/date/race. Prefer complete chart starter lists
+// over older top-three-only records. Never double count duplicate uploads.
+function rtCanonicalHistoricalResults(){
+ const merged=new Map();
  for(const [key,data] of Object.entries(RACETWIN_HISTORICAL_RESULTS||{})){
-  const [date,track]=key.split('|'),card=rtFindCard(track,date);
-  if(!card)continue;
+  const [keyDate,keyTrack]=key.split('|');
+  const date=rtCanonicalDate(keyDate||data.date),track=rtCanonicalTrack(keyTrack||data.track);
   for(const [raceKey,finishers] of Object.entries(data.races||{})){
-   const race=Number(raceKey),originalField=card.entries.filter(e=>e.race===race);
-   if(!originalField.length)continue;
-   const starters=data.starters?.[raceKey],scratches=data.scratches?.[raceKey]||[];
-   const starterSet=Array.isArray(starters)?new Set(starters.map(rtNormName)):null;
-   const scratchSet=new Set(scratches.map(rtNormName));
-   const cardSet=new Set(originalField.map(e=>rtNormName(e.horse)));
-   const duplicateCardNames=cardSet.size!==originalField.length;
-   const unmatchedStarters=starterSet?[...starterSet].filter(n=>!cardSet.has(n)):[];
-   const overlap=starterSet?[...starterSet].filter(n=>scratchSet.has(n)):[];
-   const field=originalField.filter(e=>!scratchSet.has(rtNormName(e.horse))&&(!starterSet||starterSet.has(rtNormName(e.horse))));
-   const excludedHorses=originalField.filter(e=>!field.includes(e)).map(e=>({number:e.number,horse:e.horse,reason:scratchSet.has(rtNormName(e.horse))?'Official scratch':'Not listed as starter'}));
-   const verifiedStarters=Boolean(starterSet&&starterSet.size>=2&&unmatchedStarters.length===0&&overlap.length===0&&!duplicateCardNames&&field.length===starterSet.size);
-   const allTop3Matched=Array.isArray(finishers)&&finishers.length>=Math.min(3,field.length)&&finishers.slice(0,Math.min(3,field.length)).every(name=>field.some(e=>rtNormName(e.horse)===rtNormName(name)));
-   out.push({key,track,date,race,field,originalField,finishers:finishers||[],top3Names:(finishers||[]).slice(0,3),
-    scratchCount:excludedHorses.length,scratchKnown:Boolean(starterSet),verifiedStarters,allTop3Matched,
-    excludedHorses,officialScratchNames:scratches,unmatchedStarters,overlap,source:data.source||'',cardFile:card.file});
+   const race=Number(raceKey),id=date+'|'+track+'|'+race;
+   const starters=data.starters?.[raceKey],scratches=data.scratches?.[raceKey];
+   const item={key:date+'|'+track,date,track,race,finishers,
+    starters:Array.isArray(starters)?starters:null,
+    scratches:Array.isArray(scratches)?scratches:[],
+    source:data.source||'',duplicateSources:[]};
+   const old=merged.get(id);
+   if(!old){merged.set(id,item);continue;}
+   const quality=x=>(Array.isArray(x.starters)?1000+x.starters.length:0)+(x.finishers?.length||0);
+   const best=quality(item)>quality(old)?item:old;
+   best.duplicateSources=[...new Set([...(old.duplicateSources||[]),...(item.duplicateSources||[]),old.source,item.source].filter(Boolean))];
+   merged.set(id,best);
   }
  }
- return out.sort((a,b)=>a.date.localeCompare(b.date)||a.track.localeCompare(b.track)||a.race-b.race);
+ return [...merged.values()].sort((a,b)=>a.date.localeCompare(b.date)||a.track.localeCompare(b.track)||a.race-b.race);
+}
+function rtVerifiedHistoricalRaces(){
+ const out=[];
+ for(const record of rtCanonicalHistoricalResults()){
+  const {key,date,track,race,finishers,starters,scratches}=record;
+  const card=rtFindCard(track,date);
+  if(!card)continue;
+  const originalField=card.entries.filter(e=>Number(e.race)===race);
+  if(!originalField.length)continue;
+  const starterSet=Array.isArray(starters)?new Set(starters.map(rtNormName)):null;
+  const scratchSet=new Set(scratches.map(rtNormName));
+  const cardSet=new Set(originalField.map(e=>rtNormName(e.horse)));
+  const duplicateCardNames=cardSet.size!==originalField.length;
+  const unmatchedStarters=starterSet?[...starterSet].filter(n=>!cardSet.has(n)):[];
+  const overlap=starterSet?[...starterSet].filter(n=>scratchSet.has(n)):[];
+  const field=originalField.filter(e=>!scratchSet.has(rtNormName(e.horse))&&(!starterSet||starterSet.has(rtNormName(e.horse))));
+  const excludedHorses=originalField.filter(e=>!field.includes(e)).map(e=>({number:e.number,horse:e.horse,reason:scratchSet.has(rtNormName(e.horse))?'Official scratch':'Not listed as starter'}));
+  const verifiedStarters=Boolean(starterSet&&starterSet.size>=2&&unmatchedStarters.length===0&&overlap.length===0&&!duplicateCardNames&&field.length===starterSet.size);
+  const allTop3Matched=Array.isArray(finishers)&&finishers.length>=Math.min(3,field.length)&&finishers.slice(0,Math.min(3,field.length)).every(name=>field.some(e=>rtNormName(e.horse)===rtNormName(name)));
+  out.push({key,track,date,race,field,originalField,finishers:finishers||[],top3Names:(finishers||[]).slice(0,3),
+   scratchCount:excludedHorses.length,scratchKnown:Boolean(starterSet),verifiedStarters,allTop3Matched,
+   excludedHorses,officialScratchNames:scratches,unmatchedStarters,overlap,source:record.source,
+   duplicateSources:record.duplicateSources,cardFile:card.file});
+ }
+ return out;
 }
 function rtSoftmaxLogShares(field,priorWeight){
   const raw=field.map(e=>Number.isFinite(e.ml)&&e.ml>=0?1/(1+e.ml):0.06);
@@ -674,14 +711,12 @@ function rtArchiveDataset(){
  const matched=rtVerifiedHistoricalRaces();
  const found=new Set(matched.map(r=>r.key+'|'+r.race));
  const exclusions=[];
- for(const [key,data] of Object.entries(RACETWIN_HISTORICAL_RESULTS||{})){
-  for(const raceKey of Object.keys(data.races||{})){
-   if(!found.has(key+'|'+Number(raceKey))){
-    exclusions.push({key,race:Number(raceKey),reason:'No corresponding pre-race BRIS race card or race entries',
-      officialStarters:data.starters?.[raceKey]||null,officialScratches:data.scratches?.[raceKey]||[],
-      actualTopThree:data.races[raceKey]||[],source:data.source||''});
-   }
-  }
+ for(const record of rtCanonicalHistoricalResults()){
+  if(found.has(record.key+'|'+record.race))continue;
+  exclusions.push({key:record.key,race:record.race,
+   reason:'No corresponding pre-race BRIS race card or race entries',
+   officialStarters:record.starters,officialScratches:record.scratches,
+   actualTopThree:record.finishers,source:record.source,duplicateSources:record.duplicateSources});
  }
  return {matched,exclusions};
 }
@@ -719,7 +754,7 @@ $('archiveRunBtn').onclick=async()=>{
    await new Promise(resolve=>setTimeout(resolve,0));
   }
   const summary={baseline:rtArchiveMetrics(rows,'baseline'),candidate:rtArchiveMetrics(rows,'candidate')};
-  rtArchiveReport={format:'RaceTwinArchiveCalibrationReport',version:2,generatedAt:now,
+  rtArchiveReport={format:'RaceTwinArchiveCalibrationReport',version:3,generatedAt:now,
    trialsPerRacePerModel:trials,paceSetting:pace,varianceSetting:variance,
    candidateCalibrationVerified:saved.verified===true,
    warning:'All races with complete matched starter lists are simulated after automatic historical scratching. Missing BRIS cards are exported as exclusions, never invented. Saved candidate weights may have been fitted using these same races. This is not independent validation.',
